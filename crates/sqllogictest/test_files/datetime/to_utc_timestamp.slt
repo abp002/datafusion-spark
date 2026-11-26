@@ -176,6 +176,30 @@ FROM VALUES
 2024-11-03T05:30:00
 2024-11-03T07:00:00
 
+# A time before the epoch with a fraction of a second, and the overlap and the gap of a
+# `SystemV` zone.
+query P
+SELECT to_utc_timestamp(column1, column2)
+FROM VALUES
+('1969-12-31T23:59:59.5'::timestamp, 'America/New_York'::string),
+('2024-11-03T01:30:00'::timestamp, 'SystemV/EST5EDT'::string),
+('2024-03-10T02:30:00'::timestamp, 'SystemV/EST5EDT'::string);
+----
+1970-01-01T04:59:59.500
+2024-11-03T06:30:00
+2024-03-10T07:30:00
+
+# The overlap in seconds and in nanoseconds.
+query P
+SELECT to_utc_timestamp(arrow_cast('2024-11-03T01:30:00'::timestamp, 'Timestamp(Second, None)'), 'America/New_York'::string);
+----
+2024-11-03T05:30:00
+
+query P
+SELECT to_utc_timestamp(arrow_cast('2024-11-03T01:30:00.123456789'::timestamp, 'Timestamp(Nanosecond, None)'), 'America/New_York'::string);
+----
+2024-11-03T05:30:00.123456789
+
 # Spark timezone spellings, including second-resolution offsets.
 query P
 SELECT to_utc_timestamp('2024-01-15T12:00:00'::timestamp, 'GMT+1'::string);

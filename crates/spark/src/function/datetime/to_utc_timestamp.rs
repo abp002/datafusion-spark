@@ -34,8 +34,9 @@ use datafusion_macros::user_doc;
         `SystemV/` IDs. An offset beyond 18 hours or an unknown zone is an error. A time skipped when clocks go forward \
         moves forward by the length of the gap, and a time that happens twice when clocks go back takes the earlier offset. \
         Differences from Spark: `tz` is only parsed for rows where both arguments are non-NULL, so an invalid constant `tz` \
-        can return NULL where Spark raises an error; and region rules from `chrono-tz` may differ after 2099, because it \
-        does not extrapolate later daylight saving time transitions.",
+        can return NULL where Spark raises an error; conversion is limited to Chrono's calendar range, which is narrower \
+        than the range Spark implements but covers Spark's documented range; and region rules from `chrono-tz` may differ \
+        after 2099, because it does not extrapolate later daylight saving time transitions.",
     syntax_example = "to_utc_timestamp(ts, tz)",
     sql_example = r#"```sql
 > SELECT to_utc_timestamp('2016-08-31'::timestamp, 'Asia/Seoul');
